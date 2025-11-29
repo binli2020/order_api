@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/binli2020/order_api/backend-challenge/internal/generated"
+	"github.com/binli2020/order_api/backend-challenge/internal/service"
 )
 
 type APIController struct {
@@ -13,10 +14,10 @@ type APIController struct {
 
 var _ generated.ServerInterface = (*APIController)(nil)
 
-func NewAPIController(productController *ProductController, orderController *OrderController) *APIController {
+func NewAPIController(productService *service.ProductService, orderService *service.OrderService) *APIController {
 	return &APIController{
-		ProductCtrl: productController,
-		OrderCtrl:   orderController,
+		ProductCtrl: NewProductController(*productService),
+		OrderCtrl:   NewOrderController(*orderService),
 	}
 }
 
