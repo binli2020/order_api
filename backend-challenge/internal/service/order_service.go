@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/binli2020/order_api/backend-challenge/internal/generated"
+	"github.com/google/uuid"
 )
 
 type OrderService interface {
@@ -16,7 +17,6 @@ type orderService struct {
 	productService ProductService
 	promoService   PromoService
 	promoFiles     []string
-	nextID         int64
 }
 
 func NewOrderService(
@@ -28,7 +28,6 @@ func NewOrderService(
 		productService: ps,
 		promoService:   promoSvc,
 		promoFiles:     promoFiles,
-		nextID:         1,
 	}
 }
 
@@ -101,8 +100,7 @@ func (os *orderService) PlaceOrder(req generated.OrderReq) (*generated.Order, er
 	}
 
 	// Generate order ID
-	idStr := strconv.FormatInt(os.nextID, 10)
-	os.nextID++
+	idStr := uuid.New().String()
 
 	order := &generated.Order{
 		Id:       &idStr,

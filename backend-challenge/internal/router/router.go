@@ -27,9 +27,9 @@ func NewRouter() chi.Router {
 		}
 	} else {
 		promoFiles = []string{
-			filepath.Join(promoDir, "coupon1.txt"),
-			filepath.Join(promoDir, "coupon2.txt"),
-			filepath.Join(promoDir, "coupon3.txt"),
+			filepath.Join(promoDir, "couponbase1.txt"),
+			filepath.Join(promoDir, "couponbase2.txt"),
+			filepath.Join(promoDir, "couponbase3.txt"),
 		}
 	}
 
