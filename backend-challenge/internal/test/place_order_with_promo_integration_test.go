@@ -18,9 +18,9 @@ func createPromoFilesForTest(t *testing.T) string {
 
 	dir := t.TempDir()
 
-	os.WriteFile(filepath.Join(dir, "coupon1.txt"), []byte("ABC\nPROMO123\nZZZ"), 0644)
-	os.WriteFile(filepath.Join(dir, "coupon2.txt"), []byte("NO_MATCH"), 0644)
-	os.WriteFile(filepath.Join(dir, "coupon3.txt"), []byte("ANOTHER PROMO123"), 0644)
+	os.WriteFile(filepath.Join(dir, "couponbase1.txt"), []byte("ABC\nPROMO123\nZZZ"), 0644)
+	os.WriteFile(filepath.Join(dir, "couponbase2.txt"), []byte("NO_MATCH"), 0644)
+	os.WriteFile(filepath.Join(dir, "couponbase3.txt"), []byte("ANOTHER PROMO123"), 0644)
 
 	return dir
 }
