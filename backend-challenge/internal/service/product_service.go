@@ -46,11 +46,13 @@ func (ps *productService) GetAllProducts() []generated.Product {
 }
 
 func (ps *productService) GetProductByID(id int64) (*generated.Product, bool) {
+	idStr := strconv.FormatInt(id, 10)
 	for _, p := range ps.products {
 		// generated.Product.Id is *string, convert id to string
-		if p.Id != nil && *p.Id == strconv.FormatInt(id, 10) {
+		if p.Id != nil && *p.Id == idStr {
 			return &p, true
 		}
 	}
+
 	return nil, false
 }

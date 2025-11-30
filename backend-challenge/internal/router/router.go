@@ -12,7 +12,7 @@ func NewRouter() chi.Router {
 	r := chi.NewRouter()
 
 	productService := service.NewProductService()
-	orderService := service.NewOrderService()
+	orderService := service.NewOrderService(productService)
 
 	api := controller.NewAPIController(&productService, &orderService)
 
