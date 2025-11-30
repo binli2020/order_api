@@ -1,12 +1,10 @@
-package test
+package service
 
 import (
 	"context"
 	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/binli2020/order_api/backend-challenge/internal/service"
 )
 
 func createTempPromoFile(t *testing.T, dir, filename, content string) string {
@@ -20,7 +18,7 @@ func createTempPromoFile(t *testing.T, dir, filename, content string) string {
 }
 
 func TestPromoService_FindPromo_SingleMatch(t *testing.T) {
-	ps := service.NewPromoService()
+	ps := NewPromoService()
 
 	dir := t.TempDir()
 	file1 := createTempPromoFile(t, dir, "promo1.txt", "HELLO\nDISCOUNT50\nWORLD\n")
@@ -45,7 +43,7 @@ func TestPromoService_FindPromo_SingleMatch(t *testing.T) {
 }
 
 func TestPromoService_FindPromo_MultipleMatches_StopsEarly(t *testing.T) {
-	ps := service.NewPromoService()
+	ps := NewPromoService()
 
 	dir := t.TempDir()
 	file1 := createTempPromoFile(t, dir, "promo1.txt", "PROMO123\n")
@@ -67,7 +65,7 @@ func TestPromoService_FindPromo_MultipleMatches_StopsEarly(t *testing.T) {
 }
 
 func TestPromoService_NoMatches(t *testing.T) {
-	ps := service.NewPromoService()
+	ps := NewPromoService()
 
 	dir := t.TempDir()
 	file1 := createTempPromoFile(t, dir, "promo1.txt", "nope\n")

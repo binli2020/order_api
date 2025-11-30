@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/binli2020/order_api/backend-challenge/internal/service"
@@ -19,19 +18,17 @@ func NewProductController(ps service.ProductService) *ProductController {
 func (pc *ProductController) ListProducts(w http.ResponseWriter, r *http.Request) {
 	products := pc.productService.GetAllProducts()
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(products)
+	WriteJSON(w, http.StatusOK, products)
 }
 
 // GET /product/{productId}
 func (pc *ProductController) GetProduct(w http.ResponseWriter, r *http.Request, productId int64) {
 	product, ok := pc.productService.GetProductByID(productId)
 	if !ok {
-		http.Error(w, "product not found", http.StatusNotFound)
+		WriteJSONError(w, http.StatusNotFound, ErrorTypeNotFound, "product not found")
+
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(product)
+	WriteJSON(w, http.StatusOK, product)
 }
