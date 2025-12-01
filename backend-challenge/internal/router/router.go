@@ -1,6 +1,7 @@
 package router
 
 import (
+	"log"
 	"os"
 	"path/filepath"
 
@@ -8,11 +9,19 @@ import (
 
 	"github.com/binli2020/order_api/backend-challenge/internal/controller"
 	"github.com/binli2020/order_api/backend-challenge/internal/generated"
+	"github.com/binli2020/order_api/backend-challenge/internal/middleware"
 	"github.com/binli2020/order_api/backend-challenge/internal/service"
 )
 
 func NewRouter() chi.Router {
 	r := chi.NewRouter()
+
+	logger := log.New(os.Stdout, "[order-api] ", log.LstdFlags|log.Lmicroseconds)
+
+	// ----- Add Global Middlewares -----
+	// Panic recovery first, then logging
+	r.Use(middleware.Recover(logger))
+	r.Use(middleware.Logging(logger))
 
 	productService := service.NewProductService()
 	promoService := service.NewPromoService()
