@@ -8,7 +8,7 @@ echo "📦 Test: List products"
 curl -s "${BASE_URL}/product" | jq .
 
 echo "📦 Test: Get product by ID"
-curl -s "${BASE_URL}/product/10000" | jq .
+curl -s "${BASE_URL}/product/1" | jq .
 
 echo "🧾 Test: Place order"
 curl -s -X POST "${BASE_URL}/order" \
