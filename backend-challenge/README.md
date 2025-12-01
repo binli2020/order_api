@@ -1,56 +1,127 @@
-# Advanced Challenge
+# Food Ordering API (Backend Challenge)
+The goal of this folder is to build an API server in Golang based on the given OpenAPI spec, including product listing, getting a product, placing an order, and validating promo codes with concurrency.
 
-Build an API server implementing our OpenAPI spec for food ordering API in [Go](https://go.dev).\
-You can find our [API Documentation](https://orderfoodonline.deno.dev/public/openapi.html) here.
+The project is structured with controller, service, model, router, utils, and generated code from oapi-codegen.
 
-API documentation is based on [OpenAPI3.1](https://swagger.io/specification/v3/) specification.
-You can also find spec file [here](https://orderfoodonline.deno.dev/public/openapi.yaml).
+## Features
 
-> The API immplementation example available to you at orderfoodonline.deno.dev/api is simplified and doesn't handle some edge cases intentionally.
-> Use your best judgement to build a Robust API server.
+- Implements the required API endpoints from the OpenAPI spec
+- API types and interfaces generated using oapi-codegen
+- Promo code validation uses Go concurrency:
+    - Each promo file is scanned by a separate goroutine
+    - Reads line-by-line (streaming, not loading whole file into memory)
+    - Uses channels to collect matches
+    - When a code is found in two different files, all goroutines stop immediately
 
-## Basic Requirements
 
-- Implement all APIs described in the OpenAPI specification
-- Conform to the OpenAPI specification as close to as possible
-- Implement all features our [demo API server](https://orderfoodonline.deno.dev) has implemented
-- Validate promo code according to promo code validation logic described below
+## Folder Structure
+backend-challenge
+├── cmd/server              # Main server entry
+├── internal
+│   ├── controller
+│   ├── router
+│   ├── service
+│   ├── model
+│   ├── utils
+│   └── generated           # Code created by oapi-codegen
+├── data                    # Default location for promo files (not committed)
+└── spec
 
-### Promo Code Validation
+## Promo Code File Location
 
-You will find three big files containing random text in this repositotory.\
-A promo code is valid if the following rules apply:
+To avoid committing very large files, the promo code files are not included in the repo and are ignored through .gitignore.
 
-1. Must be a string of length between 8 and 10 characters
-2. It can be found in **at least two** files
+The application looks for promo files in two ways:
 
-> Files containing valid coupons are couponbase1.gz, couponbase2.gz and couponbase3.gz
+1. If $PROMO_DIR environment variable is set
 
-You can download the files from here
+It reads files from:
+```
+$PROMO_DIR/couponbase1.txt
+$PROMO_DIR/couponbase2.txt
+$PROMO_DIR/couponbase3.txt
+```
 
-[file 1](https://orderfoodonline-files.s3.ap-southeast-2.amazonaws.com/couponbase1.gz)
-[file 2](https://orderfoodonline-files.s3.ap-southeast-2.amazonaws.com/couponbase2.gz)
-[file 3](https://orderfoodonline-files.s3.ap-southeast-2.amazonaws.com/couponbase3.gz)
+2. If $PROMO_DIR is not set
 
-**Example Promo Codes**
+It will look in the project root under:
+```
+backend-challenge/data/couponbase1.txt
+backend-challenge/data/couponbase2.txt
+backend-challenge/data/couponbase3.txt
+```
 
-Valid promo codes
+Please make sure these three files exist before testing promo code validation.
 
-- HAPPYHRS
-- FIFTYOFF
+##️ How to Run
+1. Install dependencies
+```
+go mod tidy
+```
 
-Invalid promo codes
+2. (Optional) Set promo file directory
+```
+export PROMO_DIR="/path/to/promo/files"
+```
 
-- SUPER100
+3. Start server
+```
+go run cmd/server/main.go
+```
 
-> [!TIP]
-> it should be noted that there are more valid and invalid promo codes that those shown above.
 
-## Getting Started
+Or:
+```
+./run.sh
+```
 
-You might need to configure Git LFS to clone this repository\
-https://github.com/oolio-group/kart-challenge/tree/advanced-challenge/backend-challenge
+Server runs on:
+```
+http://localhost:8080
+```
 
-1. Use this repository as a template and create a new repository in your account
-2. Start coding
-3. Share your repository
+## Test API Endpoints
+1. List all products
+curl -X GET http://localhost:8080/product
+
+2. Get a product by ID
+curl -X GET http://localhost:8080/product/1
+
+3. Place an order (with promo code)
+curl -X POST http://localhost:8080/order \
+  -H "Content-Type: application/json" \
+  -d '{
+        "couponCode": "HAPPYHRS",
+        "items": [
+          { "productId": "1", "quantity": 2 },
+          { "productId": "3", "quantity": 1 }
+        ]
+      }'
+
+🎯 Promo Code Concurrency Test
+
+Promo code is valid only if it appears exactly in two or more promo files.
+
+Example test:
+
+curl -X POST http://localhost:8080/order \
+  -H "Content-Type: application/json" \
+  -d '{
+        "couponCode": "INVALIDONE",
+        "items": [
+          { "productId": "1", "quantity": 2 },
+          { "productId": "3", "quantity": 1 }
+        ]
+      }'
+
+If invalid:
+```
+{ "message": "Invalid promo code" }
+
+```
+
+## Concurrency logic highlights
+- One goroutine per promo file
+- Uses context.Context to cancel remaining goroutines when 2 matches found
+- Streamed file reading avoids memory pressure
+- Channel used to aggregate results safely
