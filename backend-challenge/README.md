@@ -15,6 +15,7 @@ The project is structured with controller, service, model, router, utils, and ge
 
 
 ## Folder Structure
+```
 backend-challenge
 ├── cmd/server              # Main server entry
 ├── internal
@@ -26,6 +27,7 @@ backend-challenge
 │   └── generated           # Code created by oapi-codegen
 ├── data                    # Default location for promo files (not committed)
 └── spec
+```
 
 ## Promo Code File Location
 
@@ -53,7 +55,7 @@ backend-challenge/data/couponbase3.txt
 
 Please make sure these three files exist before testing promo code validation.
 
-##️ How to Run
+## How to Run
 1. Install dependencies
 ```
 go mod tidy
@@ -82,12 +84,17 @@ http://localhost:8080
 
 ## Test API Endpoints
 1. List all products
+```
 curl -X GET http://localhost:8080/product
+```
 
 2. Get a product by ID
+```
 curl -X GET http://localhost:8080/product/1
+```
 
 3. Place an order (with promo code)
+```
 curl -X POST http://localhost:8080/order \
   -H "Content-Type: application/json" \
   -d '{
@@ -97,13 +104,14 @@ curl -X POST http://localhost:8080/order \
           { "productId": "3", "quantity": 1 }
         ]
       }'
+```
 
-🎯 Promo Code Concurrency Test
+## Promo Code Concurrency Test
 
 Promo code is valid only if it appears exactly in two or more promo files.
 
 Example test:
-
+```
 curl -X POST http://localhost:8080/order \
   -H "Content-Type: application/json" \
   -d '{
@@ -113,6 +121,7 @@ curl -X POST http://localhost:8080/order \
           { "productId": "3", "quantity": 1 }
         ]
       }'
+```
 
 If invalid:
 ```
